@@ -12,3 +12,11 @@
 
 ## Datasets:
 - Retailrocket, https://www.kaggle.com/datasets/retailrocket/ecommerce-dataset
+
+## Pre-process
+
+
+Using GPU in the code instead of CPU which increases the speed of training
+
+## Results
+
