@@ -10,3 +10,5 @@
 - Include item features as side information for cold items with the DRL recommenders mentioned in https://arxiv.org/abs/2111.03474 [DRL2]
 - Include a performance comparison between the recommenders with and without item features.
 
+## Datasets:
+- Retailrocket, https://www.kaggle.com/datasets/retailrocket/ecommerce-dataset
