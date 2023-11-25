@@ -336,94 +336,96 @@ if __name__ == '__main__':
 
     tf.compat.v1.reset_default_graph()
 
-    QN_1 = QNetwork(name='QN_1', hidden_size=args.hidden_factor, learning_rate=args.lr, item_num=item_num,
-                    state_size=state_size, pretrain=False)
-    QN_2 = QNetwork(name='QN_2', hidden_size=args.hidden_factor, learning_rate=args.lr, item_num=item_num,
-                    state_size=state_size, pretrain=False)
+    with tf.device('/GPU:0'):
+        QN_1 = QNetwork(name='QN_1', hidden_size=args.hidden_factor, learning_rate=args.lr, item_num=item_num,
+                        state_size=state_size, pretrain=False)
+        QN_2 = QNetwork(name='QN_2', hidden_size=args.hidden_factor, learning_rate=args.lr, item_num=item_num,
+                        state_size=state_size, pretrain=False)
 
-    replay_buffer = pd.read_pickle(os.path.join(data_directory, 'replay_buffer.df'))
-    # saver = tf.train.Saver()
+        replay_buffer = pd.read_pickle(os.path.join(data_directory, 'replay_buffer.df'))
+        # saver = tf.train.Saver()
 
-    total_step=0
-    with tf.compat.v1.Session() as sess:
-        # Initialize variables
-        sess.run(tf.compat.v1.global_variables_initializer())
-        evaluate(sess)
-        num_rows=replay_buffer.shape[0]
-        num_batches=int(num_rows/args.batch_size)
-        for i in range(args.epoch):
-            for j in range(num_batches):
-                batch = replay_buffer.sample(n=args.batch_size).to_dict()
+        
+        total_step=0
+        with tf.compat.v1.Session() as sess:
+            # Initialize variables
+            sess.run(tf.compat.v1.global_variables_initializer())
+            # evaluate(sess)
+            num_rows=replay_buffer.shape[0]
+            num_batches=int(num_rows/args.batch_size)
+            for i in range(args.epoch):
+                for j in range(num_batches):
+                    batch = replay_buffer.sample(n=args.batch_size).to_dict()
 
-                #state = list(batch['state'].values())
+                    #state = list(batch['state'].values())
 
-                next_state = list(batch['next_state'].values())
-                len_next_state = list(batch['len_next_states'].values())
-                # double q learning, pointer is for selecting which network  is target and which is main
-                pointer = np.random.randint(0, 2)
-                if pointer == 0:
-                    mainQN = QN_1
-                    target_QN = QN_2
-                else:
-                    mainQN = QN_2
-                    target_QN = QN_1
-                target_Qs = sess.run(target_QN.output1,
-                                     feed_dict={target_QN.inputs: next_state,
-                                                target_QN.len_state: len_next_state,
-                                                target_QN.is_training:True})
-                target_Qs_selector = sess.run(mainQN.output1,
-                                              feed_dict={mainQN.inputs: next_state,
-                                                         mainQN.len_state: len_next_state,
-                                                         mainQN.is_training:True})
-                # Set target_Qs to 0 for states where episode ends
-                is_done = list(batch['is_done'].values())
-                for index in range(target_Qs.shape[0]):
-                    if is_done[index]:
-                        target_Qs[index] = np.zeros([item_num])
+                    next_state = list(batch['next_state'].values())
+                    len_next_state = list(batch['len_next_states'].values())
+                    # double q learning, pointer is for selecting which network  is target and which is main
+                    pointer = np.random.randint(0, 2)
+                    if pointer == 0:
+                        mainQN = QN_1
+                        target_QN = QN_2
+                    else:
+                        mainQN = QN_2
+                        target_QN = QN_1
+                    target_Qs = sess.run(target_QN.output1,
+                                        feed_dict={target_QN.inputs: next_state,
+                                                    target_QN.len_state: len_next_state,
+                                                    target_QN.is_training:True})
+                    target_Qs_selector = sess.run(mainQN.output1,
+                                                feed_dict={mainQN.inputs: next_state,
+                                                            mainQN.len_state: len_next_state,
+                                                            mainQN.is_training:True})
+                    # Set target_Qs to 0 for states where episode ends
+                    is_done = list(batch['is_done'].values())
+                    for index in range(target_Qs.shape[0]):
+                        if is_done[index]:
+                            target_Qs[index] = np.zeros([item_num])
 
-                state = list(batch['state'].values())
-                len_state = list(batch['len_state'].values())
-                target_Q_current = sess.run(target_QN.output1,
-                                            feed_dict={target_QN.inputs: state,
-                                                       target_QN.len_state: len_state,
-                                                       target_QN.is_training:True})
-                target_Q__current_selector = sess.run(mainQN.output1,
-                                                      feed_dict={mainQN.inputs: state,
-                                                                 mainQN.len_state: len_state,
-                                                                 mainQN.is_training:True})
-                action = list(batch['action'].values())
-                negative=[]
+                    state = list(batch['state'].values())
+                    len_state = list(batch['len_state'].values())
+                    target_Q_current = sess.run(target_QN.output1,
+                                                feed_dict={target_QN.inputs: state,
+                                                        target_QN.len_state: len_state,
+                                                        target_QN.is_training:True})
+                    target_Q__current_selector = sess.run(mainQN.output1,
+                                                        feed_dict={mainQN.inputs: state,
+                                                                    mainQN.len_state: len_state,
+                                                                    mainQN.is_training:True})
+                    action = list(batch['action'].values())
+                    negative=[]
 
-                for index in range(target_Qs.shape[0]):
-                    negative_list=[]
-                    for i in range(args.neg):
-                        neg=np.random.randint(item_num)
-                        while neg==action[index]:
-                            neg = np.random.randint(item_num)
-                        negative_list.append(neg)
-                    negative.append(negative_list)
+                    for index in range(target_Qs.shape[0]):
+                        negative_list=[]
+                        for i in range(args.neg):
+                            neg=np.random.randint(item_num)
+                            while neg==action[index]:
+                                neg = np.random.randint(item_num)
+                            negative_list.append(neg)
+                        negative.append(negative_list)
 
-                is_buy=list(batch['is_buy'].values())
-                reward=[]
-                for k in range(len(is_buy)):
-                    reward.append(reward_buy if is_buy[k] == 1 else reward_click)
-                discount = [args.discount] * len(action)
+                    is_buy=list(batch['is_buy'].values())
+                    reward=[]
+                    for k in range(len(is_buy)):
+                        reward.append(reward_buy if is_buy[k] == 1 else reward_click)
+                    discount = [args.discount] * len(action)
 
-                loss, _ = sess.run([mainQN.loss, mainQN.opt],
-                                   feed_dict={mainQN.inputs: state,
-                                              mainQN.len_state: len_state,
-                                              mainQN.targetQs_: target_Qs,
-                                              mainQN.reward: reward,
-                                              mainQN.discount: discount,
-                                              mainQN.actions: action,
-                                              mainQN.targetQs_selector: target_Qs_selector,
-                                              mainQN.negative_actions:negative,
-                                              mainQN.targetQ_current_:target_Q_current,
-                                              mainQN.targetQ_current_selector:target_Q__current_selector,
-                                              mainQN.is_training:True
-                                              })
-                total_step += 1
-                if total_step % 200 == 0:
-                    print("the loss in %dth batch is: %f" % (total_step, loss))
-                if total_step % 4000 == 0:
-                    evaluate(sess)
+                    loss, _ = sess.run([mainQN.loss, mainQN.opt],
+                                    feed_dict={mainQN.inputs: state,
+                                                mainQN.len_state: len_state,
+                                                mainQN.targetQs_: target_Qs,
+                                                mainQN.reward: reward,
+                                                mainQN.discount: discount,
+                                                mainQN.actions: action,
+                                                mainQN.targetQs_selector: target_Qs_selector,
+                                                mainQN.negative_actions:negative,
+                                                mainQN.targetQ_current_:target_Q_current,
+                                                mainQN.targetQ_current_selector:target_Q__current_selector,
+                                                mainQN.is_training:True
+                                                })
+                    total_step += 1
+                    if total_step % 200 == 0:
+                        print("the loss in %dth batch is: %f" % (total_step, loss))
+                    if total_step % 19200 == 0:
+                        evaluate(sess)
