@@ -25,14 +25,14 @@
 
 ## Results
 Performance of Recommender with features and without features for clicks and puchases
-### Without Features (SNQN.ipynb - https://github.com/rishabhshah13/AIPI531/blob/main/Homework/HW3/SNQN.ipynb)
+### Without Features (SNQN without features.ipynb - https://github.com/rishabhshah13/AIPI531/blob/main/Homework/HW3/SNQN%20without%20features.ipynb)
 | Models      | HR@5      | NDCG@5    | HR@10     | NDCG@10   | HR@15     | NDCG@15   | HR@20     | NDCG@20   |
 |-------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | [CLICKS]    | 0.262083  | 0.204893  | 0.311911  | 0.221044  | 0.339569  | 0.228370  | 0.358207  | 0.232771  |
 | [PURCHASE]  | 0.528823  | 0.446596  | 0.311911  | 0.221044  | 0.339569  | 0.228370  | 0.358207  | 0.232771  |
 
 
-### With Features (SNQN with features -   )
+### With Features (SNQN with features.ipynb - https://github.com/rishabhshah13/AIPI531/blob/main/Homework/HW3/SNQN%20with%20features.ipynb  )
 |  lambda_value          | HR@5      | NDCG@5    | HR@10     | NDCG@10   | HR@15     | NDCG@15   | HR@20     | NDCG@20   |
 |------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | (lambda=0.1) [PURCHASE] | 0.255717  | 0.220330  | 0.285390  | 0.229856  | 0.301266  | 0.234081  | 0.311283  | 0.236437  | !!!!! |
