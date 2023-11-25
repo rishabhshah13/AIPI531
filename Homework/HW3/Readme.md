@@ -18,6 +18,7 @@
 - Remove the 'timestamp' column from the item_properties dataframe and drop any duplicate rows
 - Get a list of unique item IDs from the sorted_events dataframe
 - Filter the item_prop dataframe to only include items that are in the item_list and drop any duplicate rows
+- Select only static properties which is not affected by time
 - droppig rows from item_prop where the 'property' is 'available' and the 'value' is '0'. This effectively removes any items that are not available.
 - Create a new column in item_prop called 'prop_val' that is a combination of the 'property' and 'value' columns. 
 - Made changes in code to use GPU instead of CPU which increases the speed of training
