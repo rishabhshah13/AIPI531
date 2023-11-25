@@ -21,6 +21,8 @@ Using GPU in the code instead of CPU which increases the speed of training
 ## Results
 Performance of Recommender with features and without features for clicks and puchases
 ### Without Features
+| Models |	HR@5 | NDCG@5 | HR@10	| NDCG@10	|  HR@15 | NDCG@15| HR@20 | NDCG@20 |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | [CLICKS] | 0.262083   | 0.204893 | 0.311911 | 0.221044 | 0.339569 | 0.228370 | 0.358207 | 0.232771 |    
 | [PURCHASE] | 0.528823   | 0.446596 | 0.311911 | 0.221044 | 0.339569 | 0.228370 | 0.358207 | 0.232771 | 
 
